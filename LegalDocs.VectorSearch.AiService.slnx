@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LegalDocs.VectorSearch.CLI/LegalDocs.VectorSearch.CLI.csproj" />
+  <Project Path="LegalDocs.VectorSearch.Core/LegalDocs.VectorSearch.Core.csproj" />
+</Solution>
