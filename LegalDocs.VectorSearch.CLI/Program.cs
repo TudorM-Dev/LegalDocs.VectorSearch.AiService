@@ -71,7 +71,7 @@ while (true)
     Console.WriteLine("AI is thinking... (please wait, processing locally)");
     Console.ResetColor();
 
-    string response = await aiEngine.AnalyzeTextAsync(userInput, string.Empty);
+    string response = await aiEngine.AnalyzeTextAsync(userInput, relevantContext);
 
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine("\n=== AI VERDICT ===");
