@@ -15,8 +15,12 @@ if (!Directory.Exists(docsFolder))
 
 Console.WriteLine($"Scanning for legal documents in: {docsFolder}");
 var ingestor = new DocumentIngestor();
-string legalContext = ingestor.ExtractTextFromDirectory(docsFolder);
-Console.WriteLine($"Successfully extracted {legalContext.Length} characters of legal text.");
+string fullLegalText = ingestor.ExtractTextFromDirectory(docsFolder);
+Console.WriteLine($"Successfully extracted {fullLegalText.Length} characters of legal text.");
+
+Console.WriteLine("Initializing Custom Vector Database...");
+var vectorManager = new VectorMemoryManager();
+await vectorManager.IngestTextAsync(fullLegalText);
 
 Console.WriteLine("Initializing AI Engine (Ollama - Llama 3)...");
 var aiEngine = new LegalAiEngine();
@@ -35,11 +39,16 @@ Console.ResetColor();
 
 string caseDescription = File.ReadAllText(caseFilePath);
 
+Console.ForegroundColor = ConsoleColor.Magenta;
+Console.WriteLine("Searching for relevant laws in the Vector Database...");
+string relevantContext = await vectorManager.SearchRelevantContextAsync(caseDescription);
+Console.ResetColor();
+
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine("AI is analyzing the case... (please wait, processing locally)");
 Console.ResetColor();
 
-string initialResponse = await aiEngine.AnalyzeTextAsync(caseDescription, legalContext);
+string initialResponse = await aiEngine.AnalyzeTextAsync(caseDescription, relevantContext);
 
 Console.ForegroundColor = ConsoleColor.Cyan;
 Console.WriteLine("\n=== AI INITIAL VERDICT ===");
@@ -62,7 +71,7 @@ while (true)
     Console.WriteLine("AI is thinking... (please wait, processing locally)");
     Console.ResetColor();
 
-    string response = await aiEngine.AnalyzeTextAsync(userInput, legalContext);
+    string response = await aiEngine.AnalyzeTextAsync(userInput, string.Empty);
 
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine("\n=== AI VERDICT ===");
